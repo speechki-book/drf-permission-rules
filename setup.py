@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
@@ -20,7 +20,7 @@ setup(
     description="Declarative access policies/permissions modeled after AWS' IAM policies.",
     author="Pavel Maltsev",
     author_email="pavel@speechki.org",
-    packages=["permission_rules"],
+    packages=find_packages(exclude=["tests*"]),
     url="https://github.com/speechki-book/drf-permission-rules",
     license="MIT",
     keywords="django restframework drf access policy authorization declaritive",
