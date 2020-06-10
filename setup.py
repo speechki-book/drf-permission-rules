@@ -34,4 +34,5 @@ setup(
         "redis",
         "django-model-utils==4.0.0"
     ],
+    include_package_data=True,
 )
