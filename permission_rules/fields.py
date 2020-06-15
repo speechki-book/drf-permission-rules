@@ -29,9 +29,7 @@ class AccessPolicyPermissionsField(fields.Field):
     def bind(self, field_name, parent):
         super().bind(field_name, parent)
 
-        permissions = [
-            perm for perm in self.context["view"].permission_classes if issubclass(self.permission, AccessPolicy)
-        ]
+        permissions = [perm for perm in self.context["view"].permission_classes if issubclass(perm, AccessPolicy)]
 
         if len(permissions) > 0:
             self.permission = permissions[0]
