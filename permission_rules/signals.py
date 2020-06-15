@@ -12,6 +12,7 @@ USE_REDIS = PERMISSION_RULES_SETTINGS["use_redis"]
 def cache_rule_signal(sender, instance, created, **kwargs):
     if USE_REDIS and instance.is_active:
         r = get_redis_connect()
+        r.delete(*[instance.key])
         r.set(instance.key, instance.dump_rule)
 
 

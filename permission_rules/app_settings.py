@@ -1,6 +1,6 @@
 from django.conf import settings
 
-if settings.PERMISSION_RULES_SETTINGS is not None:
+if hasattr(settings, "PERMISSION_RULES_SETTINGS"):
     PERMISSION_RULES_SETTINGS = settings.PERMISSION_RULES_SETTINGS
 else:
     PERMISSION_RULES_SETTINGS = {

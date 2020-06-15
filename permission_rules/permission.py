@@ -1,5 +1,5 @@
 from rest_access_policy import AccessPolicy
-from typing import List
+from typing import List, Optional
 from permission_rules.connect import get_redis_connect
 from permission_rules.models import PermissionRule
 import json
@@ -18,6 +18,24 @@ class CustomAccessPolicy(AccessPolicy):
         "principal": ["*"],
         "effect": "allow",
     }
+    SAFE_METHODS = ("HEAD", "OPTIONS")
+
+    def _get_statements_matching_action(
+        self, request, action: str, statements: List[dict]
+    ):
+        """
+            Filter statements and return only those that match the specified
+            action.
+        """
+        matched = []
+
+        for statement in statements:
+            if (action in statement["action"] or "*" in statement["action"]) or\
+                    ("<safe_methods>" in statement["action"] and request.method in self.SAFE_METHODS):
+
+                matched.append(statement)
+
+        return matched
 
     def get_user_group_values(self, user) -> List[str]:
         return getattr(user, "user_group_values", [])
@@ -40,8 +58,20 @@ class CustomAccessPolicy(AccessPolicy):
 
         return statements
 
-    def has_object_permission(self, request, view, obj):
-        action = self._get_invoked_action(view)
+    def has_permission(self, request, view, action: Optional[str] = None) -> bool:
+        if action is None:
+            action = self._get_invoked_action(view)
+
+        statements = self.get_policy_statements(request, view)
+        if len(statements) == 0:
+            return False
+
+        return self._evaluate_statements(statements, request, view, action)
+
+    def has_object_permission(self, request, view, obj, action: Optional[str] = None):
+        if action is None:
+            action = self._get_invoked_action(view)
+
         statements = self.get_policy_statements(request, view)
         if len(statements) == 0:
             return False
