@@ -1,9 +1,8 @@
 from django.db import models
 from model_utils.models import TimeStampedModel
-from django.contrib.postgres.fields import JSONField
-import json
 from permission_rules.connect import get_redis_connect
 from permission_rules.app_settings import PERMISSION_RULES_SETTINGS
+import json
 
 
 PREFIX = PERMISSION_RULES_SETTINGS["prefix"]
@@ -11,7 +10,7 @@ PREFIX = PERMISSION_RULES_SETTINGS["prefix"]
 
 class PermissionRule(TimeStampedModel):
     name = models.CharField(max_length=50)
-    rule = JSONField()
+    rule = models.JSONField()
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

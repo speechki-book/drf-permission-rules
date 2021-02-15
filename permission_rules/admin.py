@@ -1,6 +1,6 @@
 from django.contrib import admin
+from django.db import models
 from permission_rules.models import PermissionRule
-from django.contrib.postgres import fields
 from django_json_widget.widgets import JSONEditorWidget
 
 
@@ -11,5 +11,5 @@ class PermissionRuleAdmin(admin.ModelAdmin):
     list_filter = ["is_active"]
 
     formfield_overrides = {
-        fields.JSONField: {"widget": JSONEditorWidget},
+        models.JSONField: {"widget": JSONEditorWidget},
     }
