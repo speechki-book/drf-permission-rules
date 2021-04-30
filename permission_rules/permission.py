@@ -13,11 +13,13 @@ PREFIX = PERMISSION_RULES_SETTINGS["prefix"]
 
 class CustomAccessPolicy(AccessPolicy):
     name = ""
-    DEFAULT_STATEMENTS = {
-        "action": ["*"],
-        "principal": ["*"],
-        "effect": "allow",
-    }
+    DEFAULT_STATEMENTS = [
+        {
+            "action": ["*"],
+            "principal": ["*"],
+            "effect": "allow",
+        }
+    ]
     SAFE_METHODS = ("HEAD", "OPTIONS")
 
     def _get_statements_matching_action(
@@ -157,8 +159,10 @@ class CustomAccessPolicy(AccessPolicy):
 
 
 class AdminAccessPolicy(CustomAccessPolicy):
-    DEFAULT_STATEMENTS = {
-        "action": ["*"],
-        "principal": ["group:administrators"],
-        "effect": "allow",
-    }
+    DEFAULT_STATEMENTS = [
+        {
+            "action": ["*"],
+            "principal": ["group:administrators"],
+            "effect": "allow",
+        }
+    ]
