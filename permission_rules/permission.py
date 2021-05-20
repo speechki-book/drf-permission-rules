@@ -22,6 +22,10 @@ class CustomAccessPolicy(AccessPolicy):
     ]
     SAFE_METHODS = ("HEAD", "OPTIONS")
 
+    @classmethod
+    def scope_queryset(cls, request, qs, action: Optional[str] = None):
+        return qs.none()
+
     def _get_statements_matching_action(
         self, request, action: str, statements: List[dict]
     ):
