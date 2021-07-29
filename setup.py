@@ -13,10 +13,11 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
 ]
 setup(
     name="drf-permission-rules",
-    version="0.2.0",
+    version="0.2.1",
     description="Declarative access policies/permissions modeled after AWS' IAM policies.",
     author="Pavel Maltsev",
     author_email="pavel@speechki.org",
