@@ -4,8 +4,6 @@ from collections import defaultdict
 from rest_framework import viewsets
 from rest_framework.permissions import BasePermission
 
-from permission_rules.connect import get_redis_connect
-from permission_rules.app_settings import PERMISSION_RULES_SETTINGS
 from permission_rules.permission import CustomAccessPolicy
 from permission_rules.models import PermissionRule
 
@@ -26,7 +24,9 @@ class CachedCustomAccessPolicy(CustomAccessPolicy):
         return getattr(self.original_permission, name)
 
     def get_policy_statements(self, request, view) -> list[dict]:
-        return self.cached_statements.get(self.name, self.DEFAULT_STATEMENTS)
+        statements = self.cached_statements.get(self.name, self.original_permission.DEFAULT_STATEMENTS)
+        statements += self.original_permission.ADDITIONAL_STATEMENTS
+        return statements
 
 
 class PermissionsGetter:
