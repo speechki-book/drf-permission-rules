@@ -9,7 +9,7 @@ class ViewSetPermissionsSerializer(serializers.BaseSerializer):
             "type": openapi.TYPE_OBJECT,
             "properties": {
                 "$action_name": openapi.Schema(
-                    title="is allowd",
+                    title="is allowed",
                     type=openapi.TYPE_BOOLEAN,
                 ),
             },
