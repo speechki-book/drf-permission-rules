@@ -1,5 +1,5 @@
 from rest_framework import fields
-from permission_rules.permission import AccessPolicy
+from permission_rules.permission import CustomAccessPolicy
 
 
 class AccessPolicyPermissionsField(fields.Field):
@@ -26,14 +26,6 @@ class AccessPolicyPermissionsField(fields.Field):
 
         super().__init__(**kwargs)
 
-    def bind(self, field_name, parent):
-        super().bind(field_name, parent)
-
-        permissions = [perm for perm in self.context["view"].permission_classes if issubclass(perm, AccessPolicy)]
-
-        if len(permissions) > 0:
-            self.permission = permissions[0]
-
     def to_representation(self, value):
         """
         Calls the developer defined permission methods
@@ -43,8 +35,10 @@ class AccessPolicyPermissionsField(fields.Field):
 
         request = self.context["request"]
         view = self.context["view"]
-        permission = self.permission()
-        if self.permission:
+        permissions = [perm for perm in view.get_permissions() if isinstance(perm, CustomAccessPolicy)]
+
+        if permissions:
+            permission = permissions[0]
             for action in self.actions:
                 global_cond = permission.has_permission(request, view, action=action)
                 obj_cond = permission.has_object_permission(request, view, value, action=action)
