@@ -20,6 +20,7 @@ class CustomAccessPolicy(AccessPolicy):
             "effect": "allow",
         }
     ]
+    ADDITIONAL_STATEMENTS = []
     SAFE_METHODS = ("HEAD", "OPTIONS")
 
     @classmethod
@@ -62,7 +63,7 @@ class CustomAccessPolicy(AccessPolicy):
         else:
             statements = json.loads(statements_raw)
 
-        return statements
+        return statements + self.ADDITIONAL_STATEMENTS
 
     def has_permission(self, request, view, action: Optional[str] = None) -> bool:
         if action is None:
