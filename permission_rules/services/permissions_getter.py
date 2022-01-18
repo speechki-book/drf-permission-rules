@@ -1,11 +1,11 @@
-from typing import Union, List, Type, Dict, Any
+from typing import Union, Any, List, Type, Dict
 from collections import defaultdict
 
 from rest_framework import viewsets
 from rest_framework.permissions import BasePermission
 
 from permission_rules.permission import CustomAccessPolicy
-from permission_rules.models import PermissionRule
+from permission_rules.services.permission_rules_getter import get_permission_rules
 
 
 ViewSetName = str
@@ -23,7 +23,7 @@ class CachedCustomAccessPolicy(CustomAccessPolicy):
     def __getattr__(self, name: str) -> Any:
         return getattr(self.original_permission, name)
 
-    def get_policy_statements(self, request, view) -> list[dict]:
+    def get_policy_statements(self, request, view) -> List[dict]:
         statements = self.cached_statements.get(self.name, self.original_permission.DEFAULT_STATEMENTS)
         statements += self.original_permission.ADDITIONAL_STATEMENTS
         return statements
@@ -37,10 +37,12 @@ class PermissionsGetter:
     def _get_not_detail_actions(self, viewset: viewsets.GenericViewSet) -> list:
         not_detail_actions = []
 
-        if list_action := getattr(viewset, "list", None):
+        list_action = getattr(viewset, "list", None)
+        if list_action:
             not_detail_actions.append(list_action)
 
-        if create_action := getattr(viewset, "create", None):
+        create_action = getattr(viewset, "create", None)
+        if create_action:
             not_detail_actions.append(create_action)
 
         actions = viewset.get_extra_actions()
@@ -67,7 +69,7 @@ class PermissionsGetter:
                 if issubclass(permission_class, CustomAccessPolicy):
                     permission_rule_names.add(permission_class.name)
 
-        cached_permissions = {rule.name: rule.rule for rule in PermissionRule.objects.only("name", "rule").filter(name__in=permission_rule_names)}
+        cached_permissions = {rule.name: rule.rule for rule in get_permission_rules(permission_rule_names)}
 
         for viewset_name in permission_classes_map:
             for permission_class in permission_classes_map[viewset_name]:

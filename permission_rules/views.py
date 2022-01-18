@@ -1,3 +1,4 @@
+from typing import Dict
 from drf_yasg.utils import swagger_auto_schema
 
 from rest_framework.viewsets import GenericViewSet
@@ -10,7 +11,7 @@ from permission_rules.serializers import AllViewSetsPermissionsSerializer
 
 
 class PermissionsViewset(GenericViewSet):
-    def _get_viewset_map(self, request) -> dict[ViewSetName, dict[ActionName, bool]]:
+    def _get_viewset_map(self, request) -> Dict[ViewSetName, Dict[ActionName, bool]]:
         viewsets = [vs() for vs in PermissionActionMixinMeta.__inheritors__]
 
         result = {}

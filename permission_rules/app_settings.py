@@ -11,5 +11,7 @@ else:
             "port": "6379",
             "db": 0,
             "password": ""
-        }
+        },
+        "use_file_instead_db": False,
+        "permission_rules_file_path": '',
     }

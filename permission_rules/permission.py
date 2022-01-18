@@ -1,10 +1,12 @@
-from rest_access_policy import AccessPolicy
-from typing import List, Optional
-from permission_rules.connect import get_redis_connect
-from permission_rules.models import PermissionRule
 import json
-from permission_rules.app_settings import PERMISSION_RULES_SETTINGS
+from typing import List, Optional
+
+from rest_access_policy import AccessPolicy
 from rest_access_policy import AccessPolicyException
+
+from permission_rules.connect import get_redis_connect
+from permission_rules.app_settings import PERMISSION_RULES_SETTINGS
+from permission_rules.services.permission_rules_getter import get_permission_rule
 
 
 USE_REDIS = PERMISSION_RULES_SETTINGS["use_redis"]
@@ -47,21 +49,33 @@ class CustomAccessPolicy(AccessPolicy):
     def get_user_group_values(self, user) -> List[str]:
         return getattr(user, "user_group_values", [])
 
-    def get_policy_statements(self, request, view) -> List[dict]:
+    def _get_policy_statements_from_db(self) -> List[dict]:
+        permission_rule = get_permission_rule(self.name)
+
+        if permission_rule:
+            return permission_rule.rule
+        
+        return self.DEFAULT_STATEMENTS
+
+    def _get_policy_statements_from_redis(self) -> List[dict]:
         key = f"{PREFIX}{self.name}"
 
         r = get_redis_connect()
         statements_raw = r.get(key)
+
         if statements_raw is None:
-            try:
-                permission_rule = PermissionRule.objects.only("rule").get(name=self.name)
-                statements = permission_rule.rule
-                if USE_REDIS:
-                    r.set(key, json.dumps(statements))
-            except PermissionRule.DoesNotExist:
-                statements = self.DEFAULT_STATEMENTS
+            statements = self._get_policy_statements_from_db()
+            r.set(key, json.dumps(statements))
         else:
             statements = json.loads(statements_raw)
+
+        return statements + self.ADDITIONAL_STATEMENTS
+
+    def get_policy_statements(self, request, view) -> List[dict]:
+        if USE_REDIS:
+            statements = self._get_policy_statements_from_redis()
+        else:
+            statements = self._get_policy_statements_from_db()
 
         return statements + self.ADDITIONAL_STATEMENTS
 

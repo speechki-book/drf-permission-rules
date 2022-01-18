@@ -17,7 +17,7 @@ classifiers = [
 ]
 setup(
     name="drf-permission-rules",
-    version="0.3.0",
+    version="0.4.0",
     description="Declarative access policies/permissions modeled after AWS' IAM policies.",
     author="Pavel Maltsev",
     author_email="pavel@speechki.org",
@@ -33,7 +33,8 @@ setup(
         "djangorestframework>=3.12.2",
         "drf-access-policy>=0.8.7",
         "redis",
-        "django-model-utils>=4.1.1"
+        "django-model-utils>=4.1.1",
+        "django_json_widget>=1.1.1"
     ],
     include_package_data=True,
 )

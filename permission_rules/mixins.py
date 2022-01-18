@@ -1,3 +1,4 @@
+from typing import List, Type
 from drf_yasg.utils import swagger_auto_schema
 
 from rest_framework import viewsets
@@ -10,7 +11,7 @@ from permission_rules.serializers import ViewSetPermissionsSerializer
 
 
 class PermissionActionMixinMeta(type):
-    __inheritors__: list[type[viewsets.GenericViewSet]] = []
+    __inheritors__: List[Type[viewsets.GenericViewSet]] = []
 
     def __new__(cls, name, bases, dict_):
         class_ = type.__new__(cls, name, bases, dict_)
