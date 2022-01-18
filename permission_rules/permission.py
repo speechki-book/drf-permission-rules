@@ -1,10 +1,11 @@
-from rest_access_policy import AccessPolicy
-from typing import List, Optional
-from permission_rules.connect import get_redis_connect
-from permission_rules.models import PermissionRule
 import json
+from typing import List, Optional
+
+from rest_access_policy import AccessPolicy, AccessPolicyException
+
 from permission_rules.app_settings import PERMISSION_RULES_SETTINGS
-from rest_access_policy import AccessPolicyException
+from permission_rules.connect import get_redis_connect
+from permission_rules.services.permission_rules_getter import get_permission_rule
 
 
 USE_REDIS = PERMISSION_RULES_SETTINGS["use_redis"]
@@ -27,18 +28,17 @@ class CustomAccessPolicy(AccessPolicy):
     def scope_queryset(cls, request, qs, action: Optional[str] = None):
         return qs.none()
 
-    def _get_statements_matching_action(
-        self, request, action: str, statements: List[dict]
-    ):
+    def _get_statements_matching_action(self, request, action: str, statements: List[dict]):
         """
-            Filter statements and return only those that match the specified
-            action.
+        Filter statements and return only those that match the specified
+        action.
         """
         matched = []
 
         for statement in statements:
-            if (action in statement["action"] or "*" in statement["action"]) or\
-                    ("<safe_methods>" in statement["action"] and request.method in self.SAFE_METHODS):
+            if (action in statement["action"] or "*" in statement["action"]) or (
+                "<safe_methods>" in statement["action"] and request.method in self.SAFE_METHODS
+            ):
 
                 matched.append(statement)
 
@@ -47,21 +47,33 @@ class CustomAccessPolicy(AccessPolicy):
     def get_user_group_values(self, user) -> List[str]:
         return getattr(user, "user_group_values", [])
 
-    def get_policy_statements(self, request, view) -> List[dict]:
+    def _get_policy_statements_from_db(self) -> List[dict]:
+        permission_rule = get_permission_rule(self.name)
+
+        if permission_rule:
+            return permission_rule.rule
+
+        return self.DEFAULT_STATEMENTS
+
+    def _get_policy_statements_from_redis(self) -> List[dict]:
         key = f"{PREFIX}{self.name}"
 
         r = get_redis_connect()
         statements_raw = r.get(key)
+
         if statements_raw is None:
-            try:
-                permission_rule = PermissionRule.objects.only("rule").get(name=self.name)
-                statements = permission_rule.rule
-                if USE_REDIS:
-                    r.set(key, json.dumps(statements))
-            except PermissionRule.DoesNotExist:
-                statements = self.DEFAULT_STATEMENTS
+            statements = self._get_policy_statements_from_db()
+            r.set(key, json.dumps(statements))
         else:
             statements = json.loads(statements_raw)
+
+        return statements + self.ADDITIONAL_STATEMENTS
+
+    def get_policy_statements(self, request, view) -> List[dict]:
+        if USE_REDIS:
+            statements = self._get_policy_statements_from_redis()
+        else:
+            statements = self._get_policy_statements_from_db()
 
         return statements + self.ADDITIONAL_STATEMENTS
 
@@ -85,16 +97,12 @@ class CustomAccessPolicy(AccessPolicy):
 
         return self._evaluate_statements(statements, request, view, action, obj)
 
-    def _evaluate_statements(
-        self, statements: List[dict], request, view, action: str, obj=None
-    ) -> bool:
+    def _evaluate_statements(self, statements: List[dict], request, view, action: str, obj=None) -> bool:
         statements = self._normalize_statements(statements)
         matched = self._get_statements_matching_principal(request, statements)
         matched = self._get_statements_matching_action(request, action, matched)
 
-        matched = self._get_statements_matching_context_conditions(
-            request, view, action, matched, obj
-        )
+        matched = self._get_statements_matching_context_conditions(request, view, action, matched, obj)
 
         denied = [_ for _ in matched if _["effect"] != "allow"]
 
@@ -107,9 +115,9 @@ class CustomAccessPolicy(AccessPolicy):
         self, request, view, action: str, statements: List[dict], obj=None
     ):
         """
-            Filter statements and only return those that match all of their
-            custom context conditions; if no conditions are provided then
-            the statement should be returned.
+        Filter statements and only return those that match all of their
+        custom context conditions; if no conditions are provided then
+        the statement should be returned.
         """
         matched = []
         condition_name = "condition"
@@ -137,10 +145,10 @@ class CustomAccessPolicy(AccessPolicy):
 
     def _check_condition(self, condition: str, request, view, action: str, obj=None):
         """
-            Evaluate a custom context condition; if method does not exist on
-            the access policy class, then return False.
-            Condition value can contain a value that is passed to method, if
-            formatted as `<method_name>:<arg_value>`.
+        Evaluate a custom context condition; if method does not exist on
+        the access policy class, then return False.
+        Condition value can contain a value that is passed to method, if
+        formatted as `<method_name>:<arg_value>`.
         """
         parts = condition.split(":", 1)
         method_name = parts[0]
@@ -155,10 +163,7 @@ class CustomAccessPolicy(AccessPolicy):
             result = method(request, view, action)
 
         if type(result) is not bool:
-            raise AccessPolicyException(
-                "condition '%s' must return true/false, not %s"
-                % (condition, type(result))
-            )
+            raise AccessPolicyException("condition '%s' must return true/false, not %s" % (condition, type(result)))
 
         return result
 

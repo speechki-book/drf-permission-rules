@@ -4,3 +4,4 @@ drf-access-policy>=0.8.7
 redis
 django-model-utils>=4.1.1
 drf-yasg[validation]==1.20.0
+django_json_widget>=1.1.1

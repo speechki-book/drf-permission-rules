@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.db import models
-from permission_rules.models import PermissionRule
+
 from django_json_widget.widgets import JSONEditorWidget
+
+from permission_rules.models import PermissionRule
 
 
 @admin.register(PermissionRule)

@@ -1,7 +1,8 @@
-from django.db.models.signals import post_save, post_delete
-from permission_rules.connect import get_redis_connect
-from permission_rules.app_settings import PERMISSION_RULES_SETTINGS
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+
+from permission_rules.app_settings import PERMISSION_RULES_SETTINGS
+from permission_rules.connect import get_redis_connect
 from permission_rules.models import PermissionRule
 
 

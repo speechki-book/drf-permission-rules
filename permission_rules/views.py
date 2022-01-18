@@ -1,16 +1,18 @@
-from drf_yasg.utils import swagger_auto_schema
+from typing import Dict
 
-from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
+
+from drf_yasg.utils import swagger_auto_schema
 
 from permission_rules.mixins import PermissionActionMixinMeta
-from permission_rules.services.permissions_getter import PermissionsGetter, ViewSetName, ActionName
 from permission_rules.serializers import AllViewSetsPermissionsSerializer
+from permission_rules.services.permissions_getter import ActionName, PermissionsGetter, ViewSetName
 
 
 class PermissionsViewset(GenericViewSet):
-    def _get_viewset_map(self, request) -> dict[ViewSetName, dict[ActionName, bool]]:
+    def _get_viewset_map(self, request) -> Dict[ViewSetName, Dict[ActionName, bool]]:
         viewsets = [vs() for vs in PermissionActionMixinMeta.__inheritors__]
 
         result = {}

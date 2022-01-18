@@ -1,11 +1,11 @@
-from typing import Union, List, Type, Dict, Any
 from collections import defaultdict
+from typing import Any, Dict, List, Type, Union
 
-from rest_framework import viewsets
 from rest_framework.permissions import BasePermission
+from rest_framework import viewsets
 
 from permission_rules.permission import CustomAccessPolicy
-from permission_rules.models import PermissionRule
+from permission_rules.services.permission_rules_getter import get_permission_rules
 
 
 ViewSetName = str
@@ -23,7 +23,7 @@ class CachedCustomAccessPolicy(CustomAccessPolicy):
     def __getattr__(self, name: str) -> Any:
         return getattr(self.original_permission, name)
 
-    def get_policy_statements(self, request, view) -> list[dict]:
+    def get_policy_statements(self, request, view) -> List[dict]:
         statements = self.cached_statements.get(self.name, self.original_permission.DEFAULT_STATEMENTS)
         statements += self.original_permission.ADDITIONAL_STATEMENTS
         return statements
@@ -37,10 +37,12 @@ class PermissionsGetter:
     def _get_not_detail_actions(self, viewset: viewsets.GenericViewSet) -> list:
         not_detail_actions = []
 
-        if list_action := getattr(viewset, "list", None):
+        list_action = getattr(viewset, "list", None)
+        if list_action:
             not_detail_actions.append(list_action)
 
-        if create_action := getattr(viewset, "create", None):
+        create_action = getattr(viewset, "create", None)
+        if create_action:
             not_detail_actions.append(create_action)
 
         actions = viewset.get_extra_actions()
@@ -58,7 +60,9 @@ class PermissionsGetter:
 
         return permission_classes
 
-    def _get_cached_permissions(self, permission_classes_map: Dict[ViewSetName, PermissionClasses]) -> Dict[ViewSetName, Permissions]:
+    def _get_cached_permissions(
+        self, permission_classes_map: Dict[ViewSetName, PermissionClasses]
+    ) -> Dict[ViewSetName, Permissions]:
         result = defaultdict(list)
         permission_rule_names = set()
 
@@ -67,12 +71,14 @@ class PermissionsGetter:
                 if issubclass(permission_class, CustomAccessPolicy):
                     permission_rule_names.add(permission_class.name)
 
-        cached_permissions = {rule.name: rule.rule for rule in PermissionRule.objects.only("name", "rule").filter(name__in=permission_rule_names)}
+        cached_permissions = {rule.name: rule.rule for rule in get_permission_rules(permission_rule_names)}
 
         for viewset_name in permission_classes_map:
             for permission_class in permission_classes_map[viewset_name]:
                 if issubclass(permission_class, CustomAccessPolicy):
-                    permission = CachedCustomAccessPolicy(permission_class.name, permission_class(), cached_permissions)
+                    permission = CachedCustomAccessPolicy(
+                        permission_class.name, permission_class(), cached_permissions
+                    )
                 else:
                     permission = permission_class()
 
@@ -90,7 +96,10 @@ class PermissionsGetter:
         return self._get_cached_permissions(permissions_classes_map)
 
     def _check_permissions(
-        self, viewset: viewsets.GenericViewSet, action, permissions: List[Union[BasePermission, CustomAccessPolicy]]
+        self,
+        viewset: viewsets.GenericViewSet,
+        action,
+        permissions: List[Union[BasePermission, CustomAccessPolicy]],
     ) -> bool:
         for permission in permissions:
             allowed = True
@@ -117,13 +126,17 @@ class PermissionsGetter:
             not_detail_actions = self._get_not_detail_actions(viewset)
 
             for action in not_detail_actions:
-                viewset_permissions[action.__name__] = self._check_permissions(viewset, action, permissions_map[viewset_name])
+                viewset_permissions[action.__name__] = self._check_permissions(
+                    viewset, action, permissions_map[viewset_name]
+                )
 
             result[viewset_name] = viewset_permissions
 
         return result
 
     @classmethod
-    def get_viewsets_permissions(cls, viewsets: List[viewsets.GenericViewSet], request) -> Dict[ViewSetName, Dict[ActionName, bool]]:
+    def get_viewsets_permissions(
+        cls, viewsets: List[viewsets.GenericViewSet], request
+    ) -> Dict[ViewSetName, Dict[ActionName, bool]]:
         getter = cls(viewsets, request)
         return getter._get_viewsets_permissions()

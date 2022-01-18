@@ -1,6 +1,6 @@
-from drf_yasg import openapi
-
 from rest_framework import serializers
+
+from drf_yasg import openapi
 
 
 class ViewSetPermissionsSerializer(serializers.BaseSerializer):
