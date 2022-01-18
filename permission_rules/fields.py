@@ -1,4 +1,5 @@
 from rest_framework import fields
+
 from permission_rules.permission import CustomAccessPolicy
 
 
@@ -7,10 +8,9 @@ class AccessPolicyPermissionsField(fields.Field):
 
     def __init__(self, actions=None, additional_actions=None, global_only=False, object_only=False, **kwargs):
         """See class description for parameters and usage"""
-        assert not (global_only and object_only), (
-            "Both global_only and object_only cannot be set to true "
-            "on a AccessPolicyPermissionsField"
-        )
+        assert not (
+            global_only and object_only
+        ), "Both global_only and object_only cannot be set to true on a AccessPolicyPermissionsField"
         self.action_method_map = {}
 
         self.global_only = global_only

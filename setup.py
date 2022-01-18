@@ -34,7 +34,7 @@ setup(
         "drf-access-policy>=0.8.7",
         "redis",
         "django-model-utils>=4.1.1",
-        "django_json_widget>=1.1.1"
+        "django_json_widget>=1.1.1",
     ],
     include_package_data=True,
 )

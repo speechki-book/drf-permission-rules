@@ -1,12 +1,12 @@
 import json
-from typing import Optional, Union, List, Dict, Set
+from typing import Dict, List, Optional, Set, Union
 
 from permission_rules.app_settings import PERMISSION_RULES_SETTINGS
 from permission_rules.models import PermissionRule
 
 
-USE_FILE = PERMISSION_RULES_SETTINGS['use_file_instead_db']
-FILE_PATH = PERMISSION_RULES_SETTINGS['permission_rules_file_path']
+USE_FILE = PERMISSION_RULES_SETTINGS["use_file_instead_db"]
+FILE_PATH = PERMISSION_RULES_SETTINGS["permission_rules_file_path"]
 
 
 class PermissionRulesFromFileContainer:
@@ -17,7 +17,7 @@ class PermissionRulesFromFileContainer:
     def _load(cls):
         if cls._loaded:
             return
-        
+
         with open(FILE_PATH, "r") as p_file:
             rules_data = json.loads(p_file.read())
 
@@ -29,7 +29,7 @@ class PermissionRulesFromFileContainer:
                 rule=p_rule_data["rule"],
                 is_active=p_rule_data["is_active"],
             )
-        
+
         cls._loaded = True
 
     @classmethod

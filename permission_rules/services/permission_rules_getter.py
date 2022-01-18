@@ -1,12 +1,12 @@
-from typing import Optional, Union, List, Set
+from typing import List, Optional, Set, Union
 
 from permission_rules.app_settings import PERMISSION_RULES_SETTINGS
 from permission_rules.models import PermissionRule
 from permission_rules.services.permission_rules_file import PermissionRulesFromFileContainer
 
 
-USE_FILE = PERMISSION_RULES_SETTINGS['use_file_instead_db']
-FILE_PATH = PERMISSION_RULES_SETTINGS['permission_rules_file_path']
+USE_FILE = PERMISSION_RULES_SETTINGS["use_file_instead_db"]
+FILE_PATH = PERMISSION_RULES_SETTINGS["permission_rules_file_path"]
 
 
 def _get_permission_rule_from_db(name: str) -> Optional[PermissionRule]:

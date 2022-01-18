@@ -1,8 +1,11 @@
-from django.db import models
-from model_utils.models import TimeStampedModel
-from permission_rules.connect import get_redis_connect
-from permission_rules.app_settings import PERMISSION_RULES_SETTINGS
 import json
+
+from django.db import models
+
+from model_utils.models import TimeStampedModel
+
+from permission_rules.app_settings import PERMISSION_RULES_SETTINGS
+from permission_rules.connect import get_redis_connect
 
 
 PREFIX = PERMISSION_RULES_SETTINGS["prefix"]

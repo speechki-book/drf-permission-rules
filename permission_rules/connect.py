@@ -1,4 +1,5 @@
 import redis
+
 from permission_rules.app_settings import PERMISSION_RULES_SETTINGS
 
 
