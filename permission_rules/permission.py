@@ -9,6 +9,7 @@ from permission_rules.services.permission_rules_getter import get_permission_rul
 
 
 USE_REDIS = PERMISSION_RULES_SETTINGS["use_redis"]
+USE_FILE = PERMISSION_RULES_SETTINGS["use_file_instead_db"]
 PREFIX = PERMISSION_RULES_SETTINGS["prefix"]
 
 
@@ -70,7 +71,7 @@ class CustomAccessPolicy(AccessPolicy):
         return statements + self.ADDITIONAL_STATEMENTS
 
     def get_policy_statements(self, request, view) -> List[dict]:
-        if USE_REDIS:
+        if USE_REDIS and not USE_FILE:
             statements = self._get_policy_statements_from_redis()
         else:
             statements = self._get_policy_statements_from_db()
