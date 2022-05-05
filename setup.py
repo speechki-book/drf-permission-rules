@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
 from codecs import open
-from os import path
 
 
 def readme():
@@ -17,7 +16,7 @@ classifiers = [
 ]
 setup(
     name="drf-permission-rules",
-    version="0.4.0",
+    version="0.4.1",
     description="Declarative access policies/permissions modeled after AWS' IAM policies.",
     author="Pavel Maltsev",
     author_email="pavel@speechki.org",

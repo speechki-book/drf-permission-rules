@@ -15,6 +15,13 @@ PermissionClasses = List[Union[Type[BasePermission], Type[CustomAccessPolicy]]]
 
 
 class CachedCustomAccessPolicy(CustomAccessPolicy):
+    # For compatibility with AccessPolicy
+    def __new__(cls, *args, **kwargs):
+        if not args and not kwargs:
+            return CustomAccessPolicy(*args, **kwargs)
+
+        return super().__new__(cls)
+
     def __init__(self, name: str, original_permission: CustomAccessPolicy, cached_permissions):
         self.name = name
         self.original_permission = original_permission
