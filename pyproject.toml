@@ -1,3 +1,37 @@
+[tool.poetry]
+name = "drf-permission-rules"
+version = "0.4.2"
+description = "Declarative access policies/permissions modeled after AWS' IAM policies."
+authors = ["Pavel Maltsev <pavel@speechki.org>", "Bulat Kurbanov <kurbanovbul@gmail.com>"]
+readme = "README.md"
+homepage = "https://github.com/speechki-book/drf-permission-rules"
+license = "MIT"
+keywords=["django", "restframework", "drf", "access", "policy", "authorization", "declaritive"]
+packages = [{include = "permission_rules"}]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+exclude = ["tests*"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+django = ">=3.1.6"
+djangorestframework = ">=3.12.2"
+drf-access-policy = ">=0.8.7"
+redis = "*"
+django-model-utils = ">=4.1.1"
+django-json-widget = ">=1.1.1"
+drf-yasg = {version = "1.20.0", extras = ["validation"]}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
 [tool.black]
 line-length = 119
 include = '\.pyi?$'
