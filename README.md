@@ -61,3 +61,18 @@ Response:
     }
 }
 ```
+
+
+## Speedup
+
+You can get permissions from a file instead of a database.
+
+```
+# settings.py
+
+
+PERMISSION_RULES_SETTINGS = {
+    "use_file_instead_db": true,
+    "permission_rules_file_path": "/path/to/permissions.json"
+}
+```
