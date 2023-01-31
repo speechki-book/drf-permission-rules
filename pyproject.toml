@@ -18,13 +18,13 @@ exclude = ["tests*"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-django = ">=3.1.6"
-djangorestframework = ">=3.12.2"
-drf-access-policy = ">=0.8.7"
-redis = "*"
-django-model-utils = ">=4.1.1"
-django-json-widget = ">=1.1.1"
-drf-yasg = {version = "1.20.0", extras = ["validation"]}
+django = "^3.1.6"
+djangorestframework = "^3.12.2"
+drf-access-policy = "^0.8.7"
+redis = "^4"
+django-model-utils = "^4.1.1"
+django-json-widget = "^1.1.1"
+drf-yasg = {version = "^1.20.0", extras = ["validation"]}
 
 
 [build-system]
