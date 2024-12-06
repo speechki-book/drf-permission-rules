@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "drf-permission-rules"
-version = "0.4.5"
+version = "0.4.6"
 description = "Declarative access policies/permissions modeled after AWS' IAM policies."
 authors = ["Pavel Maltsev <pavel@speechki.org>", "Bulat Kurbanov <kurbanovbul@gmail.com>"]
 readme = "README.md"
