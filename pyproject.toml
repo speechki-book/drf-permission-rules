@@ -102,3 +102,9 @@ known_baseframework = ["django"]
 known_frameworkext = ["rest_framework"]
 src_paths = ["permission_rules"]
 skip_glob = ["setup.py"]
+
+[tool.poetry.group.dev.dependencies]
+black = "^26.5.1"
+isort = "^9.0.1"
+pyproject-flake8 = "^7.0.0"
+lefthook = "^2.1.12"

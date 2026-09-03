@@ -1,0 +1,32 @@
+pre-commit:
+  parallel: true
+  commands:
+    black:
+      run: poetry run black {staged_files}
+      glob: "*.py"
+      exclude:
+        - "docs/**"
+        - "node_modules/**"
+        - "**/migrations/**"
+        - ".git/**"
+        - ".tox/**"
+      stage_fixed: true
+    isort:
+      run: poetry run isort {staged_files}
+      glob: "*.py"
+      exclude:
+        - "docs/**"
+        - "node_modules/**"
+        - "**/migrations/**"
+        - ".git/**"
+        - ".tox/**"
+      stage_fixed: true
+    pflake8:
+      run: poetry run pflake8 {staged_files}
+      glob: "*.py"
+      exclude:
+        - "docs/**"
+        - "node_modules/**"
+        - "**/migrations/**"
+        - ".git/**"
+        - ".tox/**"

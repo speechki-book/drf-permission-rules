@@ -8,7 +8,7 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  pre-commit:
+  lefthook:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -19,17 +19,11 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install pre-commit
-        run: pip3 install pre-commit
+      - name: Install Poetry
+        run: pip3 install poetry
 
-      - name: Pre-commit (Push)
-        env:
-          SETUPTOOLS_USE_DISTUTILS: stdlib
-        if: ${{ github.event_name == 'push' }}
-        run: pre-commit run --source ${{ github.event.before }} --origin ${{ github.event.after }} --show-diff-on-failure
+      - name: Install dependencies
+        run: poetry install --with dev
 
-      - name: Pre-commit (Pull-Request)
-        env:
-          SETUPTOOLS_USE_DISTUTILS: stdlib
-        if: ${{ github.event_name == 'pull_request' }}
-        run: pre-commit run --source ${{ github.event.pull_request.base.sha }} --origin ${{ github.event.pull_request.head.sha }} --show-diff-on-failure
+      - name: Run Lefthook
+        run: poetry run lefthook run pre-commit --all-files
