@@ -1,13 +1,15 @@
-[tool.poetry]
+[project]
 name = "drf-permission-rules"
 version = "0.5.0"
 description = "Declarative access policies/permissions modeled after AWS' IAM policies."
-authors = ["Pavel Maltsev <pavel@speechki.org>", "Bulat Kurbanov <kurbanovbul@gmail.com>"]
+authors = [
+    { name = "Pavel Maltsev", email = "pavel@speechki.org" },
+    { name = "Bulat Kurbanov", email = "kurbanovbul@gmail.com" },
+]
 readme = "README.md"
-homepage = "https://github.com/speechki-book/drf-permission-rules"
 license = "MIT"
-keywords=["django", "restframework", "policy", "authorization", "declaritive"]
-packages = [{include = "permission_rules"}]
+requires-python = ">=3.10"
+keywords = ["django", "restframework", "policy", "authorization", "declaritive"]
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.10",
@@ -20,22 +22,36 @@ classifiers = [
     "Framework :: Django :: 5.1",
     "Framework :: Django :: 5.2",
 ]
-exclude = ["tests*"]
+dependencies = [
+    "django",
+    "djangorestframework",
+    "drf-access-policy",
+    "redis",
+    "django-model-utils",
+    "django-json-widget",
+    "drf-yasg[validation]",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-django = "*"
-djangorestframework = "*"
-drf-access-policy = "*"
-redis = "*"
-django-model-utils = "*"
-django-json-widget = "*"
-drf-yasg = {version = "*", extras = ["validation"]}
+[project.urls]
+Homepage = "https://github.com/speechki-book/drf-permission-rules"
 
+[dependency-groups]
+dev = [
+    "black>=26.5.1,<27",
+    "isort>=9.0.1,<10",
+    "pyproject-flake8>=7.0.0,<8",
+    "lefthook>=2.1.12,<3",
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["permission_rules"]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["tests*"]
 
 
 [tool.black]
@@ -102,9 +118,3 @@ known_baseframework = ["django"]
 known_frameworkext = ["rest_framework"]
 src_paths = ["permission_rules"]
 skip_glob = ["setup.py"]
-
-[tool.poetry.group.dev.dependencies]
-black = "^26.5.1"
-isort = "^9.0.1"
-pyproject-flake8 = "^7.0.0"
-lefthook = "^2.1.12"
