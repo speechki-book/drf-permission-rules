@@ -11,9 +11,12 @@ def clear_cache(chunk_size: int = 100) -> bool:
 
     cursor = 0
     ns_keys = prefix + "*"
-    while cursor != 0:
+    # do/while: SCAN starts at cursor 0 and signals completion by returning cursor 0.
+    while True:
         cursor, keys = r.scan(cursor=cursor, match=ns_keys, count=chunk_size)
         if keys:
             r.delete(*keys)
+        if cursor == 0:
+            break
 
     return True
