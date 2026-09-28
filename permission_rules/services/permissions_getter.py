@@ -59,7 +59,8 @@ class PermissionsGetter:
         return not_detail_actions
 
     def _get_viewset_permission_classes(self, viewset: viewsets.GenericViewSet) -> PermissionClasses:
-        permission_classes: PermissionClasses = getattr(viewset.__class__, "permission_classes", [])
+        # Copy: `+=` on the class attribute would mutate it in place (often APIView.permission_classes, process-wide).
+        permission_classes: PermissionClasses = list(getattr(viewset.__class__, "permission_classes", []))
 
         if viewset.permission_classes:
             permission_classes += viewset.permission_classes
