@@ -7,7 +7,6 @@ from rest_framework import viewsets
 from permission_rules.permission import CustomAccessPolicy
 from permission_rules.services.permission_rules_getter import get_permission_rules
 
-
 ViewSetName = str
 ActionName = str
 Permissions = List[Union[BasePermission, CustomAccessPolicy]]
@@ -60,7 +59,8 @@ class PermissionsGetter:
         return not_detail_actions
 
     def _get_viewset_permission_classes(self, viewset: viewsets.GenericViewSet) -> PermissionClasses:
-        permission_classes: PermissionClasses = getattr(viewset.__class__, "permission_classes", [])
+        # Copy: `+=` on the class attribute would mutate it in place (often APIView.permission_classes, process-wide).
+        permission_classes: PermissionClasses = list(getattr(viewset.__class__, "permission_classes", []))
 
         if viewset.permission_classes:
             permission_classes += viewset.permission_classes
