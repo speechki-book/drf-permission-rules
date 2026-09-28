@@ -7,7 +7,6 @@ from rest_framework import viewsets
 from permission_rules.permission import CustomAccessPolicy
 from permission_rules.services.permission_rules_getter import get_permission_rules
 
-
 ViewSetName = str
 ActionName = str
 Permissions = List[Union[BasePermission, CustomAccessPolicy]]
@@ -32,8 +31,8 @@ class CachedCustomAccessPolicy(CustomAccessPolicy):
 
     def get_policy_statements(self, request, view) -> List[dict]:
         statements = self.cached_statements.get(self.name, self.original_permission.DEFAULT_STATEMENTS)
-        statements += self.original_permission.ADDITIONAL_STATEMENTS
-        return statements
+        # Build a new list: `+=` would mutate the cached (or class-level DEFAULT_STATEMENTS) list in place.
+        return statements + self.original_permission.ADDITIONAL_STATEMENTS
 
 
 class PermissionsGetter:
