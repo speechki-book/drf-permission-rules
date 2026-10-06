@@ -1,7 +1,9 @@
 name: Publish
 
+# Publish only when a tag is pushed. `create` does not support a `tags` filter and fires on
+# every new branch too, which published 0.5.2 from a feature branch before review.
 on:
-  create:
+  push:
     tags:
       - '*'
 
@@ -19,10 +21,19 @@ jobs:
           python-version: "3.11"
           enable-cache: true
 
+      - name: Check tag matches project version
+        run: |
+          VERSION=$(uv run --no-project --python 3.11 python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          if [ "$GITHUB_REF_NAME" != "$VERSION" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match project version $VERSION" >&2
+            exit 1
+          fi
+
       - name: Build package
         run: uv build
 
       - name: Publish to PyPI
-        run: uv publish
+        # --check-url skips files that already exist on PyPI (e.g. tagging a version published earlier)
+        run: uv publish --check-url https://pypi.org/simple/
         env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
