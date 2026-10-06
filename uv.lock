@@ -172,7 +172,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/61/e0/0afc125fa190ffd4e
 
 [[package]]
 name = "drf-permission-rules"
-version = "0.5.1"
+version = "0.5.2"
 source = { editable = "." }
 dependencies = [
     { name = "django", version = "5.2.17", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },

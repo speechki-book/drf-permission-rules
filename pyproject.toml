@@ -1,6 +1,6 @@
 [project]
 name = "drf-permission-rules"
-version = "0.5.1"
+version = "0.5.2"
 description = "Declarative access policies/permissions modeled after AWS' IAM policies."
 authors = [
     { name = "Pavel Maltsev", email = "pavel@speechki.org" },
